@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "POV_LED_Display_OUTER", "POV_LED_Display_OUTER\POV_LED_Display.vcxproj", "{68F062A0-54FA-47CB-A28B-483F326F5FB7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{68F062A0-54FA-47CB-A28B-483F326F5FB7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{68F062A0-54FA-47CB-A28B-483F326F5FB7}.Debug|Win32.Build.0 = Debug|Win32
+		{68F062A0-54FA-47CB-A28B-483F326F5FB7}.Release|Win32.ActiveCfg = Release|Win32
+		{68F062A0-54FA-47CB-A28B-483F326F5FB7}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

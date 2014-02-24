@@ -77,13 +77,15 @@
   <ItemGroup>
     <ClCompile Include="comm.c" />
     <ClCompile Include="display.c" />
+    <ClCompile Include="display_queue.c" />
     <ClCompile Include="main.c" />
-    <ClCompile Include="queue.c" />
+    <ClCompile Include="rx_queue.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="comm.h" />
     <ClInclude Include="display.h" />
-    <ClInclude Include="queue.h" />
+    <ClInclude Include="display_queue.h" />
+    <ClInclude Include="rx_queue.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

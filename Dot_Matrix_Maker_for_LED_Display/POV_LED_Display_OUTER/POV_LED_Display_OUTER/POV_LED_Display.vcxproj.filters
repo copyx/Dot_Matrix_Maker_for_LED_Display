@@ -18,24 +18,30 @@
     <ClCompile Include="main.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="queue.c">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="comm.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="display.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="rx_queue.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="display_queue.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="queue.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="comm.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="display.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="rx_queue.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="display_queue.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

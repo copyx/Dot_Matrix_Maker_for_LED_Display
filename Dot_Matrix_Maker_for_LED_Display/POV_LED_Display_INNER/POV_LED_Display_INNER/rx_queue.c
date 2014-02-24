@@ -3,7 +3,12 @@
 
 RX_CQ RX_Queue;
 
-unsigned char enqueue(RX_CQ* queue, unsigned char item)
+void init_RX_Queue(void)
+{
+	RX_Queue.front = RX_Queue.rear = 0;
+}
+
+unsigned char enqueue_RX(RX_CQ* queue, unsigned char item)
 {
 	if(IS_FULL(queue))
 		return 0;
@@ -15,7 +20,7 @@ unsigned char enqueue(RX_CQ* queue, unsigned char item)
 	}
 }
 
-unsigned char* dequeue(RX_CQ* queue)
+unsigned char* dequeue_RX(RX_CQ* queue)
 {
 	if(IS_EMPTY(queue))
 		return NULL;

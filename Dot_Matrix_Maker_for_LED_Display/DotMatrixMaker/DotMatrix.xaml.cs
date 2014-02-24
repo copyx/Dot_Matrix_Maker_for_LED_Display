@@ -23,9 +23,10 @@ namespace DotMatrixMaker
         static string FileName;
         static string OpenPath;
         static string UploadPath = @"C:\MAHA3\";
-        
 
-        bool DotMouseLeftButtonDown = false, DotMouseEnter = false;
+        const byte BigWidth = 64, BigHeight = 32, SmallWidth = 48, SmallHeight = 16;        
+
+        bool DotMouseLeftButtonDown = false, DotMouseEnter = false, SmallMode = false;
 
         UInt32[] CHeaderColorBit = new UInt32[4];
         UInt32[] DotMatrixBit = new UInt32[64];
@@ -66,8 +67,12 @@ namespace DotMatrixMaker
         private void CHeader_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             byte CHeaderNumber = Convert.ToByte(((Rectangle)e.Source).Name.ToString().Substring(2));
+            byte height;
+
+            if (SmallMode && (CHeaderNumber >= SmallWidth))
+                return;
+
             UInt32 CHeaderColorNumber = (UInt32)((CHeaderColorBit[CHeaderNumber / 16] & (3 << (CHeaderNumber % 16 * 2))) >> ((CHeaderNumber % 16) * 2));
-            //CHeaderColorNumber >>= (CHeaderNumber % 16) * 2;
 
             SolidColorBrush CHeaderColor;
 
@@ -91,7 +96,11 @@ namespace DotMatrixMaker
             CHeaderColorBit[CHeaderNumber / 16] |= (UInt32)(CHeaderColorNumber << ((CHeaderNumber % 16) * 2));
             ((Rectangle)e.Source).Fill = CHeaderColor;
 
-            for (int i = 0; i < 32; i++)
+            if (SmallMode)
+                height = SmallHeight;
+            else
+                height = BigHeight;
+            for (int i = 0; i < height; i++)
             {
                 if((DotMatrixBit[CHeaderNumber] & (1 << i)) != 0)
                     Dots[i, CHeaderNumber].Fill = CHeaderColor;
@@ -103,8 +112,10 @@ namespace DotMatrixMaker
             UInt16 DotNumber = Convert.ToUInt16(((Rectangle)e.Source).Name.ToString().Substring(1));
             byte DRow = (byte)(DotNumber / 100), DCol = (byte)(DotNumber % 100);
 
+            if (SmallMode && ((DRow >= SmallHeight) || (DCol >= SmallWidth)))
+                return;
+
             UInt32 CHeaderColorNumber = (UInt32)((CHeaderColorBit[DCol / 16] & (3 << (DCol % 16 * 2))) >> ((DCol % 16) * 2));
-            //CHeaderColorNumber >>= (DCol % 16) * 2;
             SolidColorBrush DotColor;
 
             if ((DotMatrixBit[DCol] & (1 << DRow)) == 0)
@@ -117,9 +128,13 @@ namespace DotMatrixMaker
                 {
                     DotColor = new SolidColorBrush(Colors.Yellow);
                 }
-                else
+                else if (CHeaderColorNumber == 2)
                 {
                     DotColor = new SolidColorBrush(Colors.Blue);
+                }
+                else
+                {
+                    DotColor = new SolidColorBrush(Colors.White);
                 }
                 DotMatrixBit[DCol] |= (UInt32)(1 << DRow);
             }
@@ -135,9 +150,13 @@ namespace DotMatrixMaker
                     {
                         DotColor = new SolidColorBrush(Colors.Yellow);
                     }
-                    else
+                    else if (CHeaderColorNumber == 2)
                     {
                         DotColor = new SolidColorBrush(Colors.Blue);
+                    }
+                    else
+                    {
+                        DotColor = new SolidColorBrush(Colors.White);
                     }
                 }
                 else
@@ -174,6 +193,11 @@ namespace DotMatrixMaker
         private void Reset_Click(object sender, RoutedEventArgs e)
         {
             Reset_DotMatrix();
+
+            if (SmallMode)
+                ChangeToSmall_Click(sender, e);
+            else
+                ChangeToBig_Click(sender, e);
         }
 
         private void Reset_DotMatrix()
@@ -217,7 +241,12 @@ namespace DotMatrixMaker
         {
             SaveFileDialog SaveDlg = new SaveFileDialog();
             SaveDlg.Title = "Save";
-            SaveDlg.FileName = "Noname";
+
+            if(SmallMode)
+                SaveDlg.FileName = SmallWidth.ToString() + "X" + SmallHeight.ToString() + "_Noname";
+            else
+                SaveDlg.FileName = BigWidth.ToString() + "X" + BigHeight.ToString() + "_Noname"; ;
+
             SaveDlg.InitialDirectory = Directory.GetCurrentDirectory();
             SaveDlg.AddExtension = true;
             SaveDlg.DefaultExt = ".txt";
@@ -229,49 +258,83 @@ namespace DotMatrixMaker
             }
         }
 
-        private string get_UnsignedByteString(byte value)
-        {
-            string UnsignedByte;
-
-            if (value > 127)
-            {
-                UnsignedByte = "-" + (value - 128).ToString();
-            }
-            else
-            {
-                UnsignedByte = value.ToString();
-            }
-
-            return UnsignedByte;
-        }
-
         private void Save_DotMatrixInfo(string SavePath)
         {
             byte[] temp;
+            byte length, height;
             StreamWriter SW = new StreamWriter(SavePath);
 
             FileName = SavePath.Trim().Split('\\').Last();
             FileName = FileName.Remove(FileName.Length - 4);
             this.Title += " - " + FileName + " - " + SavePath;
 
+            if (SmallMode)
+                SW.WriteLine("S");
+            else
+                SW.WriteLine("B");
+
             SW.WriteLine(CommentBox.Text);
 
-            for (int i = 0; i < 4; i++)
+            if (SmallMode)
+                length = 3;
+            else
+                length = 4;
+
+            for (int i = 0; i < length; i++)
             {
                 temp = BitConverter.GetBytes(CHeaderColorBit[i]);
                 for (int j = 0; j < temp.Length; j++)
-                    SW.Write(get_UnsignedByteString(temp[j]) + " ");
+                    SW.Write(get_SignedByteString(temp[j]) + ",");
             }
 
             SW.Write(SW.NewLine);
 
-            for (int i = 0; i < 64; i++)
+            if (SmallMode)
+            {
+                length = SmallWidth;
+                height = 2;
+            }
+            else
+            {
+                length = BigWidth;
+                height = 4;
+            }
+
+            for (int i = 0; i < length; i++)
             {
                 temp = BitConverter.GetBytes(DotMatrixBit[i]);
-                for (int j = 0; j < temp.Length; j++)
-                    SW.Write(get_UnsignedByteString(temp[j]) + " ");
+                for (int j = 0; j < height; j++)
+                    SW.Write(get_SignedByteString(temp[j]) + ",");
             }
             SW.Close();
+        }
+
+        private string get_SignedByteString(byte value)
+        {
+            string SignedByte;
+
+            if (value > 127)
+            {
+                SignedByte = "-" + (value - 128).ToString();
+            }
+            else
+            {
+                SignedByte = value.ToString();
+            }
+
+            return SignedByte;
+        }
+
+        private byte get_UnsignedByteString(string value)
+        {
+            byte UnsignedByte;
+
+            if (value[0].Equals('-'))
+                UnsignedByte = (byte)(128 + Convert.ToByte(value.Substring(1)));
+            else
+                UnsignedByte = Convert.ToByte(value);
+
+            return UnsignedByte;
         }
 
         private void Open_Click(object sender, RoutedEventArgs e)
@@ -299,13 +362,18 @@ namespace DotMatrixMaker
 
                 SR.BaseStream.Seek(0, SeekOrigin.Begin);
 
+                if (SR.ReadLine().Equals("S"))
+                    SmallMode = true;
+                else
+                    SmallMode = false;
+
                 CommentBox.Text = SR.ReadLine();
 
                 StrNumbers = SR.ReadLine().Trim().Split(' ');
                 ByteNumbers = new byte[StrNumbers.Length];
                 
                 for(int i = 0; i < StrNumbers.Length; i++)
-                    ByteNumbers[i] = Convert.ToByte(StrNumbers[i]);
+                    ByteNumbers[i] = get_UnsignedByteString(StrNumbers[i]);
 
                 for (int i = 0; i < (StrNumbers.Length / 4); i++)
                 {
@@ -316,17 +384,28 @@ namespace DotMatrixMaker
                 ByteNumbers = new byte[StrNumbers.Length];
 
                 for (int i = 0; i < StrNumbers.Length; i++)
-                    ByteNumbers[i] = Convert.ToByte(StrNumbers[i]);
+                    ByteNumbers[i] = get_UnsignedByteString(StrNumbers[i]);
 
-                for (int i = 0; i < (StrNumbers.Length / 4); i++)
-                {
-                    DotMatrixBit[i] = BitConverter.ToUInt32(ByteNumbers, i * 4);
-                }
+                if(SmallMode)
+                    for (int i = 0; i < (StrNumbers.Length / 2); i++)
+                    {
+                        DotMatrixBit[i] = (UInt32)BitConverter.ToUInt16(ByteNumbers, i * 2);
+                    }
+                else
+                    for (int i = 0; i < (StrNumbers.Length / 4); i++)
+                    {
+                        DotMatrixBit[i] = BitConverter.ToUInt32(ByteNumbers, i * 4);
+                    }
 
                 SR.Close();
                 FS.Close();
 
                 Apply_Dots();
+
+                if (SmallMode)
+                    ChangeToSmall_Click(sender, e);
+                else
+                    ChangeToBig_Click(sender, e);
             }
         }
 
@@ -357,12 +436,16 @@ namespace DotMatrixMaker
                 {
                     if ((DotMatrixBit[i] & (1 << j)) != 0)
                         Dots[j, i].Fill = DotColor;
+                    else
+                        Dots[j, i].Fill = new SolidColorBrush(Colors.Black);
                 }
             }
         }
 
         private void Upload_Click(object sender, RoutedEventArgs e)
         {
+            byte length, height;
+
             if (FileName == null)
             {
                 MessageBox.Show("파일이 저장되지 않았습니다.");
@@ -382,20 +465,36 @@ namespace DotMatrixMaker
 
             SW = new StreamWriter(UploadPath + "edit_image\\" + FileName + "_Data.txt");
 
-            for (int i = 0; i < 4; i++)
+            if (SmallMode)
+                length = 3;
+            else
+                length = 4;
+
+            for (int i = 0; i < length; i++)
             {
                 temp = BitConverter.GetBytes(CHeaderColorBit[i]);
                 for (int j = 0; j < temp.Length; j++)
-                    SW.Write(temp[j] + " ");
+                    SW.Write(get_SignedByteString(temp[j]) + ",");
             }
 
             SW.Write(SW.NewLine);
 
-            for (int i = 0; i < 64; i++)
+            if (SmallMode)
+            {
+                length = SmallWidth;
+                height = 2;
+            }
+            else
+            {
+                length = BigWidth;
+                height = 4;
+            }
+
+            for (int i = 0; i < length; i++)
             {
                 temp = BitConverter.GetBytes(DotMatrixBit[i]);
-                for (int j = 0; j < temp.Length; j++)
-                    SW.Write(temp[j] + " ");
+                for (int j = 0; j < height; j++)
+                    SW.Write(get_SignedByteString(temp[j]) + ",");
             }
             SW.Close();
 
@@ -404,10 +503,10 @@ namespace DotMatrixMaker
 
         private void Make_Thumbnail(FrameworkElement Source, double Scale)
         {
-            ImageSave(ConverterBitmapImage(Source, Scale));
+            ImageSave(ConverterBitmapImage(Source, Scale, SmallMode));
         }
 
-        private static RenderTargetBitmap ConverterBitmapImage(FrameworkElement Element, double Scale)
+        private static RenderTargetBitmap ConverterBitmapImage(FrameworkElement Element, double Scale, bool small)
         {
             double RenderHeight = Element.ActualHeight * Scale;
             double RenderWidth = Element.ActualWidth * Scale;
@@ -420,6 +519,13 @@ namespace DotMatrixMaker
 
             drawingContext.Close();
             // 비트맵으로 변환합니다.
+
+            if (small)
+            {
+                RenderHeight /= 2;
+                RenderWidth = RenderWidth * 3 / 4;
+            }
+
             RenderTargetBitmap target = new RenderTargetBitmap((int)RenderWidth, (int)RenderHeight, 96, 96, System.Windows.Media.PixelFormats.Pbgra32);
             target.Render(drawingVisual);
 
@@ -438,6 +544,29 @@ namespace DotMatrixMaker
             Encoder.Save(stream);
 
             stream.Close();
+        }
+
+        private void ChangeToSmall_Click(object sender, RoutedEventArgs e)
+        {
+            SmallMode = true;
+            SolidColorBrush DotColor = new SolidColorBrush(Colors.White);
+
+            for (int i = SmallWidth; i < BigWidth; i++)
+                CHeader[i].Fill = DotColor;
+
+            for (int i = 0; i < SmallHeight; i++)
+                for (int j = SmallWidth; j < BigWidth; j++)
+                    Dots[i, j].Fill = DotColor;
+
+            for (int i = SmallHeight; i < BigHeight; i++)
+                for (int j = 0; j < BigWidth; j++)
+                    Dots[i, j].Fill = DotColor;
+        }
+
+        private void ChangeToBig_Click(object sender, RoutedEventArgs e)
+        {
+            SmallMode = false;
+            Apply_Dots();
         }
     }
 }

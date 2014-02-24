@@ -13,23 +13,16 @@
                 <MenuItem Header="_Upload" Click="Upload_Click" />
             </MenuItem>
             <MenuItem Header="Mode">
-                <MenuItem Header="32 X 64" />
-                <MenuItem Header="?? X ??" />
+                <MenuItem Header="32 X 64" Click="ChangeToBig_Click" />
+                <MenuItem Header="16 X 48" Click="ChangeToSmall_Click" />
             </MenuItem>
         </Menu>
         <Grid DockPanel.Dock="Top" Height="15"/>
         <Grid DockPanel.Dock="Bottom" Height="20"/>
         <Grid DockPanel.Dock="Left" Width="20"/>
         <Grid DockPanel.Dock="Left">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="15" />
-                <RowDefinition Height="480" />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="960" />
-            </Grid.ColumnDefinitions>
-            <UniformGrid Name="DotMatrixHeaderGrid" Grid.Row="0" Columns="64" Rows="1">
+            <StackPanel>
+            <UniformGrid Name="DotMatrixHeaderGrid" Columns="64" Rows="1" Width="960" Height="15">
                 <Rectangle Name="CH00" Fill="Red" Stroke="DarkGray" MouseLeftButtonDown="CHeader_MouseLeftButtonDown" />
                 <Rectangle Name="CH01" Fill="Red" Stroke="DarkGray" MouseLeftButtonDown="CHeader_MouseLeftButtonDown" />
                 <Rectangle Name="CH02" Fill="Red" Stroke="DarkGray" MouseLeftButtonDown="CHeader_MouseLeftButtonDown" />
@@ -95,8 +88,8 @@
                 <Rectangle Name="CH62" Fill="Red" Stroke="DarkGray" MouseLeftButtonDown="CHeader_MouseLeftButtonDown" />
                 <Rectangle Name="CH63" Fill="Red" Stroke="DarkGray" MouseLeftButtonDown="CHeader_MouseLeftButtonDown" />
             </UniformGrid>
-            <UniformGrid Name="DotsGrid" Grid.Row="1" Columns="64" Rows="32" Height="480">
-                <Rectangle Name="D0000" Fill="Black" Stroke="DarkGray" MouseLeftButtonDown="Dot_MouseLeftButtonDown" MouseEnter="Dot_MouseEnter" MouseLeftButtonUp="Dot_MouseLeftButtonUp" />
+            <UniformGrid Name="DotsGrid" Columns="64" Rows="32" Width="960" Height="480">
+                <Rectangle Height="15" Width="15" Name="D0000" Fill="Black" Stroke="DarkGray" MouseLeftButtonDown="Dot_MouseLeftButtonDown" MouseEnter="Dot_MouseEnter" MouseLeftButtonUp="Dot_MouseLeftButtonUp" Visibility="Visible" />
                 <Rectangle Name="D0001" Fill="Black" Stroke="DarkGray" MouseLeftButtonDown="Dot_MouseLeftButtonDown" MouseEnter="Dot_MouseEnter" MouseLeftButtonUp="Dot_MouseLeftButtonUp" />
                 <Rectangle Name="D0002" Fill="Black" Stroke="DarkGray" MouseLeftButtonDown="Dot_MouseLeftButtonDown" MouseEnter="Dot_MouseEnter" MouseLeftButtonUp="Dot_MouseLeftButtonUp" />
                 <Rectangle Name="D0003" Fill="Black" Stroke="DarkGray" MouseLeftButtonDown="Dot_MouseLeftButtonDown" MouseEnter="Dot_MouseEnter" MouseLeftButtonUp="Dot_MouseLeftButtonUp" />
@@ -2145,15 +2138,16 @@
                 <Rectangle Name="D3162" Fill="Black" Stroke="DarkGray" MouseLeftButtonDown="Dot_MouseLeftButtonDown" MouseEnter="Dot_MouseEnter" MouseLeftButtonUp="Dot_MouseLeftButtonUp" />
                 <Rectangle Name="D3163" Fill="Black" Stroke="DarkGray" MouseLeftButtonDown="Dot_MouseLeftButtonDown" MouseEnter="Dot_MouseEnter" MouseLeftButtonUp="Dot_MouseLeftButtonUp" />
             </UniformGrid>
-            <Grid Grid.Row="2">
+            <Grid>
                 <TextBlock Height="20">Comment :</TextBlock>
                 <TextBox Name="CommentBox" Margin="68,0,45,0" Background="#1D000000" IsEnabled="True" IsReadOnly="True" />
                 <Button Name="EditButton" Margin="915,0,0,0" Click="EditButton_Click">Edit</Button>
-            </Grid>
+                </Grid>
+            </StackPanel>
         </Grid>
         <Grid DockPanel.Dock="Right" Width="30" />
         <Grid DockPanel.Dock="Right" Width="40">
-            <Button Click="Reset_Click" Height="495" Margin="0,0,0,30">Reset</Button>
+            <Button Click="Reset_Click" Margin="0,0,0,30">Reset</Button>
         </Grid>
     </DockPanel>
 </Window>
