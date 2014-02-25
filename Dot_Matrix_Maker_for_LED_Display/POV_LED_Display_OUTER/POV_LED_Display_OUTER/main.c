@@ -8,11 +8,13 @@ int main(void)
 	init_Comm();
 	init_Display();
 
-	//명령 수신
-	detect_RX_Data();
 
 	while(1)
+	{
+		//명령 수신
+		detect_RX_Data();
 		GPIO_Interrupt();
+	}
 
 	return 0;
 }

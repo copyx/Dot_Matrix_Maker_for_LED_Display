@@ -37,6 +37,7 @@ namespace DotMatrixMaker
         {
             InitializeComponent();
             Dot_Binding();
+
         }
 
         private void Dot_Binding()
@@ -202,7 +203,15 @@ namespace DotMatrixMaker
 
         private void Reset_DotMatrix()
         {
-            SolidColorBrush ResetColor = new SolidColorBrush(Colors.Black);
+            SolidColorBrush ResetColor = new SolidColorBrush(Colors.Red);
+
+            for (int i = 0; i < 4; i++)
+                CHeaderColorBit[i] = 0;
+
+            for (int i = 0; i < 64; i++)
+                CHeader[i].Fill = ResetColor;
+
+            ResetColor = new SolidColorBrush(Colors.Black);
 
             for (int i = 0; i < 64; i++)
                 DotMatrixBit[i] = 0;
@@ -263,10 +272,11 @@ namespace DotMatrixMaker
             byte[] temp;
             byte length, height;
             StreamWriter SW = new StreamWriter(SavePath);
+            OpenPath = SavePath;
 
             FileName = SavePath.Trim().Split('\\').Last();
             FileName = FileName.Remove(FileName.Length - 4);
-            this.Title += " - " + FileName + " - " + SavePath;
+            this.Title = "DotMatrix - " + FileName + " - " + SavePath;
 
             if (SmallMode)
                 SW.WriteLine("S");
@@ -284,7 +294,7 @@ namespace DotMatrixMaker
             {
                 temp = BitConverter.GetBytes(CHeaderColorBit[i]);
                 for (int j = 0; j < temp.Length; j++)
-                    SW.Write(get_SignedByteString(temp[j]) + ",");
+                    SW.Write(get_SignedByteString(temp[j]) + " ");
             }
 
             SW.Write(SW.NewLine);
@@ -304,7 +314,7 @@ namespace DotMatrixMaker
             {
                 temp = BitConverter.GetBytes(DotMatrixBit[i]);
                 for (int j = 0; j < height; j++)
-                    SW.Write(get_SignedByteString(temp[j]) + ",");
+                    SW.Write(get_SignedByteString(temp[j]) + " ");
             }
             SW.Close();
         }
@@ -355,7 +365,7 @@ namespace DotMatrixMaker
                 OpenPath = OpenDlg.FileName;
                 FileName = OpenDlg.FileName.Trim().Split('\\').Last();
                 FileName = FileName.Remove(FileName.Length - 4);
-                this.Title += " - " + FileName + " - " + OpenDlg.FileName;
+                this.Title = "Dotmatrix - " + FileName + " - " + OpenDlg.FileName;
 
                 FileStream FS = File.OpenRead(OpenDlg.FileName);
                 StreamReader SR = new StreamReader(FS, System.Text.Encoding.Default);
@@ -459,11 +469,19 @@ namespace DotMatrixMaker
             byte[] temp;
             StreamWriter SW = new StreamWriter(UploadPath + "title_comment\\" + FileName + ".txt");
 
-            SW.WriteLine(FileName + "#" + CommentBox.Text);
+            if (CommentBox.Text.Equals(""))                
+                SW.WriteLine(FileName + "#NULL");
+            else
+                SW.WriteLine(FileName + "#" + CommentBox.Text);
 
             SW.Close();
 
             SW = new StreamWriter(UploadPath + "edit_image\\" + FileName + "_Data.txt");
+
+            if (SmallMode)
+                SW.WriteLine("S");
+            else
+                SW.WriteLine("B");
 
             if (SmallMode)
                 length = 3;
@@ -474,7 +492,7 @@ namespace DotMatrixMaker
             {
                 temp = BitConverter.GetBytes(CHeaderColorBit[i]);
                 for (int j = 0; j < temp.Length; j++)
-                    SW.Write(get_SignedByteString(temp[j]) + ",");
+                    SW.Write(get_SignedByteString(temp[j]) + " ");
             }
 
             SW.Write(SW.NewLine);
@@ -494,7 +512,7 @@ namespace DotMatrixMaker
             {
                 temp = BitConverter.GetBytes(DotMatrixBit[i]);
                 for (int j = 0; j < height; j++)
-                    SW.Write(get_SignedByteString(temp[j]) + ",");
+                    SW.Write(get_SignedByteString(temp[j]) + " ");
             }
             SW.Close();
 
@@ -567,6 +585,12 @@ namespace DotMatrixMaker
         {
             SmallMode = false;
             Apply_Dots();
+        }
+
+        private void New_Click(object sender, RoutedEventArgs e)
+        {
+            Reset_Click(sender, e);
+            SaveAs_Click(sender, e);
         }
     }
 }

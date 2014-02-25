@@ -23,6 +23,13 @@ enum ROTATION_STATUS
 {
 	STOP = 0,
 	CW,
+	CCW,
+};
+
+enum DISPLAY_MODE
+{
+	STR = 0,
+	IMG,
 };
 
 
@@ -34,10 +41,12 @@ typedef struct Inner_String_Data
 
 typedef struct INNER_Display_Status_Content
 {
-	unsigned char nothing : 5;
+	unsigned char nothing : 1;
 	unsigned char power : 1;
+	unsigned char mode : 1;
 	unsigned char new_str : 1;
 	unsigned char using_str : 1;
+	unsigned char rotation : 2;
 }INNER_STAT_CONTENT;
 
 typedef union INNER_Display_Status
@@ -50,11 +59,11 @@ typedef union INNER_Display_Status
 
 void init_Display(void);
 void turn_Power_INNER_Display(unsigned char);
-void GPIO_Interrupt(void);
+void TIMER_Interrupt(void);
 
 extern INNER_String STR_Buffer[2];
 extern INNER_DISP_STAT INNER_Status;
 extern const unsigned char LED_COLOR_MASK[4];
-extern char DEFAULT_Characters[NUMBER_OF_LED_CHAR][LED_CHAR_WIDTH][2];
+extern unsigned char DEFAULT_Characters[NUMBER_OF_LED_CHAR][LED_CHAR_WIDTH][2];
 
 #endif

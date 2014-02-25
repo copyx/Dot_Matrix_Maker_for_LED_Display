@@ -2,9 +2,10 @@
 #include "display.h"
 #include <stdio.h>
 
-DISP_CQ DISP_Queue;
+STR_DISP_CQ STR_DISP_Queue;
+IMG_CQ IMG_Queue;
 
-void init_DISP_CQ(DISP_CQ* queue)
+void init_STR_DISP_CQ(STR_DISP_CQ* queue)
 {
 	int i;
 
@@ -15,9 +16,14 @@ void init_DISP_CQ(DISP_CQ* queue)
 		queue->item[i] = NULL;
 }
 
-void enqueue_DISP(DISP_CQ* queue)
+void init_IMG_CQ(IMG_CQ* queue)
 {
-	char* item;
+	queue->current_img = queue->current_line = queue->total_img = 0;
+}
+
+void enqueue_STR_DISP_Line(STR_DISP_CQ* queue)
+{
+	unsigned char* item;
 	static char empty = 0;
 
 	if(empty >= 48)
@@ -34,7 +40,7 @@ void enqueue_DISP(DISP_CQ* queue)
 
 	if(queue->char_index < STR_Buffer[INNER_Status.content.using_str].length)
 	{
-		item = (char*)DEFAULT_Characters[STR_Buffer[INNER_Status.content.using_str].data[queue->char_index] - 'A'][queue->char_line];
+		item = DEFAULT_Characters[STR_Buffer[INNER_Status.content.using_str].data[queue->char_index] - 'A'][queue->char_line];
 
 		//문자 인덱스들 증가
 		queue->char_line = (queue->char_line + 1) % LED_CHAR_WIDTH;
